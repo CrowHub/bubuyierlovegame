@@ -89,6 +89,38 @@
         border-radius: 15px;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
       }
+
+      /* 移动端优化样式 */
+      @media (pointer: coarse) {
+        .button-group {
+          position: relative;
+          min-height: 120px;
+        }
+
+        #btn-no {
+          transition: transform 0.4s !important;
+          position: static;
+          transform: translate(0, 0);
+        }
+
+        /* 提升移动端点击体验 */
+        .btn {
+          min-width: 180px;
+          padding: 18px 35px;
+          touch-action: manipulation;
+        }
+
+        /* 防止IOS点击延迟 */
+        * {
+          -webkit-tap-highlight-color: transparent;
+        }
+      }
+
+      /* 通用动画增强 */
+      #btn-no {
+        will-change: transform;
+        backface-visibility: hidden;
+      }
     </style>
   </head>
   <body>
@@ -221,6 +253,57 @@
           imgElement.style.opacity = 1;
         }, 300);
       }, 1000);
+
+      // 增加移动端点击事件处理
+      let isTouching = false;
+
+      // 统一事件处理函数
+      function handleNoAction(e) {
+        e.preventDefault(); // 阻止默认行为
+        if (isTouching) return;
+
+        isTouching = true;
+
+        // 触觉反馈
+        if (navigator.vibrate) navigator.vibrate(30);
+
+        // 智能边界计算
+        const btnRect = btnNo.getBoundingClientRect();
+        const maxX = window.innerWidth - btnRect.width;
+        const maxY = window.innerHeight - btnRect.height;
+
+        // 生成新坐标（保证可见性）
+        const newX = Math.max(20, Math.min(maxX - 20, Math.random() * maxX));
+        const newY = Math.max(20, Math.min(maxY - 20, Math.random() * maxY));
+
+        // 流畅动画
+        btnNo.style.transition =
+          "all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55)";
+        btnNo.style.transform = `translate(${newX - btnRect.left}px, ${
+          newY - btnRect.top
+        }px)`;
+
+        // 状态重置
+        setTimeout(() => {
+          btnNo.style.transition = "";
+          isTouching = false;
+        }, 400);
+      }
+
+      // 事件绑定优化
+      if ("ontouchstart" in window) {
+        btnNo.addEventListener("touchstart", handleNoAction, {
+          passive: false,
+        });
+      } else {
+        btnNo.addEventListener("mouseover", handleNoAction);
+      }
+
+      // 添加点击阻止
+      btnNo.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
     </script>
   </body>
 </html>
