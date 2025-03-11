@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>一二布布の奇妙问答</title>
+    <style>
+      body {
+        background: #ffe6f2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        font-family: "Microsoft YaHei", sans-serif;
+      }
+
+      .container {
+        text-align: center;
+        padding: 20px;
+      }
+
+      .yierbubu-img {
+        width: 300px;
+        transition: transform 0.3s;
+        margin: 20px 0;
+        transition: all 0.5s ease, opacity 0.3s ease;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 30px;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 25px;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+      }
+
+      #btn-yes {
+        background: #ff69b4;
+        color: white;
+        box-shadow: 0 4px #ff1493;
+      }
+
+      #btn-no {
+        background: #d3d3d3;
+        color: #666;
+        box-shadow: 0 4px #a9a9a9;
+      }
+
+      /* 悬停动画 */
+      #btn-no:hover {
+        animation: shake 0.5s;
+      }
+
+      @keyframes shake {
+        0% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(10px);
+        }
+        50% {
+          transform: translateX(-10px);
+        }
+        75% {
+          transform: translateX(10px);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
+
+      .dialog {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>你愿意和布布一起玩吗？(✧◡✧)</h1>
+      <img
+        src="https://pic2.zhimg.com/v2-552dd2cec95281be85e009f51d0c7e31_b.jpg"
+        class="yierbubu-img"
+        alt="一二布布"
+      />
+
+      <div class="button-group">
+        <button class="btn" id="btn-yes">超级愿意！</button>
+        <button class="btn" id="btn-no">不要嘛~</button>
+      </div>
+
+      <div id="success-dialog" class="dialog">
+        <h2>布布喜欢你！(ﾉ≧∀≦)ﾉ</h2>
+        <p>获得限定表情包大礼包！</p>
+        <button onclick="location.reload()">再玩一次</button>
+      </div>
+    </div>
+
+    <script>
+      // 按钮交互逻辑
+      const btnNo = document.getElementById("btn-no");
+      const btnYes = document.getElementById("btn-yes");
+      const dialog = document.getElementById("success-dialog");
+
+      // 「不要」按钮悬停效果
+      btnNo.addEventListener("mouseover", () => {
+        const maxX = window.innerWidth - btnNo.offsetWidth;
+        const maxY = window.innerHeight - btnNo.offsetHeight;
+
+        btnNo.style.position = "absolute";
+        btnNo.style.left = `${Math.random() * maxX}px`;
+        btnNo.style.top = `${Math.random() * maxY}px`;
+      });
+
+      // 「愿意」按钮点击效果
+      btnYes.addEventListener("click", () => {
+        dialog.style.display = "block";
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+      });
+
+      // 简易彩纸效果
+      function confetti({ particleCount, spread, origin }) {
+        for (let i = 0; i < particleCount; i++) {
+          const confetti = document.createElement("div");
+          confetti.style = `
+                    position: fixed;
+                    width: 10px;
+                    height: 10px;
+                    background: hsl(${Math.random() * 360}deg, 100%, 50%);
+                    left: ${
+                      origin.x * 100 + Math.random() * spread - spread / 2
+                    }%;
+                    top: ${origin.y * 100}%;
+                    border-radius: 2px;
+                    animation: fall ${1 + Math.random() * 2}s linear;
+                `;
+
+          document.body.appendChild(confetti);
+
+          setTimeout(() => confetti.remove(), 2000);
+        }
+      }
+
+      const imgElement = document.querySelector(".yierbubu-img");
+      const imageUrls = [
+        "https://pic4.zhimg.com/v2-62d8be668c09b1395f5d767b244a8add_b.webp",
+        "https://pic2.zhimg.com/v2-552dd2cec95281be85e009f51d0c7e31_b.jpg",
+        "https://picx.zhimg.com/v2-31b252afeaf046d1d05b55949d3a0637_b.jpg",
+        "https://pica.zhimg.com/v2-e4c3245e31e3b2985dc725a98f340c66_b.jpg",
+        "https://picx.zhimg.com/v2-f50f54bd3c9b552a2bfdb1caa2405d11_b.jpg",
+        "https://pic2.zhimg.com/v2-a8de5c782e17521e52ac39344c2365e9_b.jpg",
+        "https://picx.zhimg.com/v2-b665f057d2d5a8af72675f539a4a95fb_b.jpg",
+        "https://pic1.zhimg.com/v2-72e8dbbf9ecd29e1ef9ef19a3266bf40_b.jpg",
+        "https://pic2.zhimg.com/v2-6c3aed53c4ac9770481b5c63c3e0d66f_b.jpg",
+        "https://pic3.zhimg.com/v2-335bbc720fe2a68c9271e18341ee9b46_b.jpg",
+        "https://pic3.zhimg.com/v2-5a41e3a00fd68e00d9b0709f4e254002_b.jpg",
+        "https://pic3.zhimg.com/v2-11fdf62ae38aef833489a357c144b7dc_b.jpg",
+        "https://pic2.zhimg.com/v2-c428c8f9f9a92f814115d96e7f2d3b31_b.jpg",
+        "https://pic3.zhimg.com/v2-57bf0ba5103bfda582a5233ede43e1f2_b.jpg",
+        "https://pica.zhimg.com/v2-9ec7961750f5dc96285a1d5da25aa518_b.jpg",
+        "https://pic2.zhimg.com/v2-9dc24b6a3d11708179e98023813a43a7_b.jpg",
+        "https://pic4.zhimg.com/v2-b02af8bd2447aba7df5727e7fe36149d_b.jpg",
+        "https://pic4.zhimg.com/v2-94054fea5d01731bde90683d4f93d719_b.jpg",
+        "https://pic1.zhimg.com/v2-110940ca3f0e30130066d3a355582be4_b.jpg",
+        "https://pica.zhimg.com/v2-6aa9a2285e0c209efe60c0f2637c67f0_b.jpg",
+        "https://pic4.zhimg.com/v2-13d2f9e3221900c3a42dc90a0f0ccf33_b.jpg",
+        "https://pic1.zhimg.com/v2-a964b2e4090e3cd6f1ae91eff5b3dd10_b.jpg",
+        "https://pic3.zhimg.com/v2-afbd7320380cfb5e4fdac599ccda5092_b.jpg",
+        "https://pic2.zhimg.com/v2-83bce473f1dc2ad5426089061b2687c1_b.jpg",
+        "https://pic4.zhimg.com/v2-36b053cbd2574dc4207d07b8bcae410b_b.jpg",
+      ];
+
+      // 初始化上次索引为-1确保首次随机无限制
+      let lastIndex = -1;
+
+      // 智能随机函数（保证不重复）
+      function getRandomIndex(length) {
+        if (length <= 1) return 0; // 安全处理
+
+        let newIndex;
+        do {
+          // 生成范围：0 ~ length-2
+          newIndex = Math.floor(Math.random() * (length - 1));
+          // 当新索引 >= 上次索引时+1，避开重复
+          if (newIndex >= lastIndex) newIndex += 1;
+        } while (newIndex === lastIndex); // 双重保险
+
+        return newIndex;
+      }
+
+      // 启动定时器
+      imgElement.style.opacity = 0;
+      setInterval(() => {
+        lastIndex = getRandomIndex(imageUrls.length);
+        imgElement.src = imageUrls[lastIndex];
+
+        // 保留原有动画效果
+        imgElement.style.transform = "scale(1.1)";
+        setTimeout(() => {
+          imgElement.style.transform = "scale(1)";
+          imgElement.style.opacity = 1;
+        }, 300);
+      }, 1000);
+    </script>
+  </body>
+</html>
