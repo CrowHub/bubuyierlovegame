@@ -90,23 +90,36 @@
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
       }
 
-      /* 添加移动端专用样式 */
-      @media (hover: none) {
-        #btn-no {
-          position: relative !important;
-          transform: translate(0) !important;
-          transition: none !important;
-        }
-
+      /* 移动端优化样式 */
+      @media (pointer: coarse) {
         .button-group {
-          flex-direction: column;
-          gap: 15px;
+          position: relative;
+          min-height: 120px;
         }
 
-        .btn {
-          width: 80vw;
-          max-width: 300px;
+        #btn-no {
+          transition: transform 0.4s !important;
+          position: static;
+          transform: translate(0, 0);
         }
+
+        /* 提升移动端点击体验 */
+        .btn {
+          min-width: 180px;
+          padding: 18px 35px;
+          touch-action: manipulation;
+        }
+
+        /* 防止IOS点击延迟 */
+        * {
+          -webkit-tap-highlight-color: transparent;
+        }
+      }
+
+      /* 通用动画增强 */
+      #btn-no {
+        will-change: transform;
+        backface-visibility: hidden;
       }
     </style>
   </head>
@@ -241,41 +254,55 @@
         }, 300);
       }, 1000);
 
-      // 在原有代码基础上增加触摸事件支持
-      let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(
-        navigator.userAgent
-      );
+      // 增加移动端点击事件处理
+      let isTouching = false;
 
-      // 修改事件监听
-      if (isMobile) {
-        btnNo.addEventListener("touchstart", handleNoButton);
+      // 统一事件处理函数
+      function handleNoAction(e) {
+        e.preventDefault(); // 阻止默认行为
+        if (isTouching) return;
+
+        isTouching = true;
+
+        // 触觉反馈
+        if (navigator.vibrate) navigator.vibrate(30);
+
+        // 智能边界计算
+        const btnRect = btnNo.getBoundingClientRect();
+        const maxX = window.innerWidth - btnRect.width;
+        const maxY = window.innerHeight - btnRect.height;
+
+        // 生成新坐标（保证可见性）
+        const newX = Math.max(20, Math.min(maxX - 20, Math.random() * maxX));
+        const newY = Math.max(20, Math.min(maxY - 20, Math.random() * maxY));
+
+        // 流畅动画
+        btnNo.style.transition =
+          "all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55)";
+        btnNo.style.transform = `translate(${newX - btnRect.left}px, ${
+          newY - btnRect.top
+        }px)`;
+
+        // 状态重置
+        setTimeout(() => {
+          btnNo.style.transition = "";
+          isTouching = false;
+        }, 400);
+      }
+
+      // 事件绑定优化
+      if ("ontouchstart" in window) {
+        btnNo.addEventListener("touchstart", handleNoAction, {
+          passive: false,
+        });
       } else {
-        btnNo.addEventListener("mouseover", handleNoButton);
+        btnNo.addEventListener("mouseover", handleNoAction);
       }
 
-      // 统一处理函数
-      function handleNoButton() {
-        const maxX = window.innerWidth - btnNo.offsetWidth;
-        const maxY = window.innerHeight - btnNo.offsetHeight;
-
-        // 添加移动边界限制（防止按钮移出屏幕）
-        const safeX = Math.max(10, Math.min(maxX - 10, Math.random() * maxX));
-        const safeY = Math.max(10, Math.min(maxY - 10, Math.random() * maxY));
-
-        btnNo.style.transition = "all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1)";
-        btnNo.style.left = `${safeX}px`;
-        btnNo.style.top = `${safeY}px`;
-
-        // 添加触觉反馈
-        if (navigator.vibrate) {
-          navigator.vibrate(50);
-        }
-      }
-
-      // 添加媒体查询检测
-      const mediaQuery = window.matchMedia("(hover: hover)");
-      mediaQuery.addListener(() => {
-        isMobile = !mediaQuery.matches;
+      // 添加点击阻止
+      btnNo.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
       });
     </script>
   </body>
